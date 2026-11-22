@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0f766e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>আমার খামার — মোবাইল খামার ব্যবস্থাপনা অ্যাপ</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #0d9488;
+    --primary-dark: #0f766e;
+    --primary-light: #ccfbf1;
+    --accent: #f59e0b;
+    --accent-dark: #b45309;
+    --danger: #e11d48;
+    --success: #059669;
+    --bg: #eef2ff;
+    --bg-grad: linear-gradient(135deg, #f0fdfa 0%, #eef2ff 50%, #fefce8 100%);
+    --card: #ffffff;
+    --text: #0f172a;
+    --muted: #475569;
+    --border: #cbd5e1;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Hind Siliguri', sans-serif; -webkit-tap-highlight-color: transparent; }
+  body { background: var(--bg-grad); min-height: 100vh; color: var(--text); line-height: 1.5; padding-bottom: 84px; }
+
+  /* Header */
+  header {
+    background: linear-gradient(120deg, #0f766e 0%, #0d9488 45%, #4f46e5 100%);
+    color: #fff;
+    padding: 13px 16px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.14);
+    position: sticky;
+    top: 0;
+    z-index: 40;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand-logo {
+    width: 40px; height: 40px; border-radius: 11px;
+    background: linear-gradient(135deg, #fbbf24, #f97316);
+    color: #0f172a;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 700;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    flex-shrink: 0;
+  }
+  .brand h1 { font-size: 18px; font-weight: 700; line-height: 1.2; }
+  .brand p { font-size: 11.5px; opacity: 0.94; }
+  .header-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .badge {
+    background: rgba(255,255,255,0.18);
+    backdrop-filter: blur(6px);
+    padding: 5px 11px;
+    border-radius: 20px;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid rgba(255,255,255,0.25);
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #34d399; }
+  .dot.offline { background: #fbbf24; }
+
+  /* Container */
+  .container { max-width: 1240px; margin: 16px auto; padding: 0 12px; }
+
+  /* Login Box */
+  .login-wrapper {
+    max-width: 490px;
+    margin: 18px auto;
+    background: var(--card);
+    border-radius: 16px;
+    padding: 22px 18px;
+    box-shadow: 0 12px 32px rgba(79, 70, 229, 0.12);
+    border: 1px solid #e2e8f0;
+  }
+  .login-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: #f1f5f9;
+    padding: 4px;
+    border-radius: 11px;
+    margin-bottom: 18px;
+  }
+  .login-tab {
+    border: none;
+    background: transparent;
+    padding: 12px 10px;
+    min-height: 46px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14.5px;
+    cursor: pointer;
+    color: var(--muted);
+    transition: 0.2s;
+  }
+  .login-tab.active {
+    background: linear-gradient(135deg, #0d9488, #0f766e);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(13, 148, 136, 0.25);
+  }
+
+  /* Form controls - large touch friendly */
+  .form-group { margin-bottom: 14px; }
+  label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+  input, select, textarea {
+    width: 100%;
+    min-height: 46px;
+    padding: 11px 13px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: 15px;
+    background: #fff;
+    color: var(--text);
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.16);
+  }
+
+  .btn {
+    border: none;
+    min-height: 46px;
+    padding: 11px 16px;
+    border-radius: 10px;
+    font-size: 14.5px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: 0.18s;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary { background: linear-gradient(135deg, #0d9488, #0f766e); color: #fff; box-shadow: 0 4px 12px rgba(13,148,136,0.22); }
+  .btn-indigo { background: linear-gradient(135deg, #4f46e5, #4338ca); color: #fff; }
+  .btn-outline { background: #fff; border: 1.5px solid var(--border); color: var(--text); }
+  .btn-success { background: linear-gradient(135deg, #10b981, #059669); color: #fff; }
+  .btn-danger { background: linear-gradient(135deg, #f43f5e, #e11d48); color: #fff; }
+  .btn-warning { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; }
+  .btn-sm { min-height: 38px; padding: 7px 12px; font-size: 13px; }
+  .btn-block { width: 100%; }
+
+  /* Dashboard */
+  .dashboard { display: none; }
+
+  /* Mobile horizontal scroll nav + quick bottom bar */
+  .dash-nav {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin-bottom: 16px;
+    background: var(--card);
+    padding: 8px;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 14px rgba(15,23,42,0.05);
+  }
+  .dash-nav::-webkit-scrollbar { display: none; }
+  .nav-btn {
+    border: none;
+    background: #f8fafc;
+    min-height: 42px;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 13.5px;
+    cursor: pointer;
+    color: var(--muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: 0.15s;
+  }
+  .nav-btn.active {
+    background: linear-gradient(135deg, #0d9488, #4f46e5);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(79, 70, 229, 0.22);
+  }
+
+  /* Bottom Fixed Mobile Quick Bar */
+  .mobile-bottom-bar {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid #cbd5e1;
+    padding: 6px 8px;
+    z-index: 50;
+    box-shadow: 0 -4px 16px rgba(15, 23, 42, 0.08);
+  }
+  .bottom-bar-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .bottom-tab {
+    border: none;
+    background: transparent;
+    padding: 6px 4px;
+    border-radius: 8px;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--muted);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    cursor: pointer;
+  }
+  .bottom-tab.active {
+    background: #ccfbf1;
+    color: #0f766e;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  @media (min-width: 768px) {
+    .stats-grid { grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  }
+  .stat-card {
+    background: var(--card);
+    padding: 14px;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 14px rgba(15,23,42,0.04);
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #0d9488, #4f46e5, #f59e0b);
+  }
+  .stat-card .label { font-size: 12.5px; color: var(--muted); font-weight: 600; }
+  .stat-card .value { font-size: 20px; font-weight: 700; margin-top: 4px; color: #0f766e; }
+
+  .card {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 16px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 14px rgba(15,23,42,0.04);
+  }
+  .card-title {
+    font-size: 17px; font-weight: 700; margin-bottom: 14px;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
+    color: #1e293b;
+  }
+
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+
+  /* Weight Chart Bars */
+  .chart-row { margin-bottom: 12px; }
+  .chart-label { display: flex; justify-content: space-between; font-size: 13.5px; font-weight: 600; margin-bottom: 4px; }
+  .chart-track {
+    width: 100%; height: 14px; background: #e2e8f0; border-radius: 999px; overflow: hidden;
+  }
+  .chart-fill {
+    height: 100%; border-radius: 999px;
+    background: linear-gradient(90deg, #0d9488, #4f46e5, #f59e0b);
+    transition: width 0.35s ease;
+  }
+
+  /* Table */
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 540px; }
+  th, td { padding: 11px 10px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+  th { background: #f8fafc; font-weight: 700; color: #1e293b; }
+  tr:hover { background: #f0fdfa; }
+
+  .status-pill {
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+  }
+  .status-healthy { background: #d1fae5; color: #065f46; }
+  .status-treat { background: #ffe4e6; color: #9f1239; }
+  .status-preg { background: #fef3c7; color: #92400e; }
+
+  .hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
+  .alert {
+    padding: 11px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    margin-bottom: 14px;
+  }
+  .alert-info { background: #eef2ff; color: #3730a3; border: 1px solid #c7d2fe; }
+
+  /* Printable Report */
+  .report-box {
+    border: 2px solid #0f766e;
+    padding: 18px;
+    border-radius: 10px;
+    background: #fff;
+  }
+  .report-header { text-align: center; border-bottom: 1px dashed #64748b; padding-bottom: 12px; margin-bottom: 16px; }
+  .report-sign { display: flex; justify-content: space-between; gap: 16px; margin-top: 36px; padding-top: 10px; font-size: 13px; }
+  .report-sign div { border-top: 1px solid #334155; padding-top: 4px; flex: 1; text-align: center; }
+
+  @media (max-width: 767px) {
+    .mobile-bottom-bar.active-bar { display: block; }
+    .brand p { display: none; }
+    .brand h1 { font-size: 17px; }
+  }
+
+  @media print {
+    header, .dash-nav, .mobile-bottom-bar, .no-print, .btn, .alert { display: none !important; }
+    body { background: #fff; padding-bottom: 0; }
+    .container { max-width: 100%; margin: 0; padding: 0; }
+    .card { border: none; box-shadow: none; padding: 0; }
+    .report-box { border: 1px solid #000; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="brand-logo">খ</div>
+    <div>
+      <h1>আমার খামার</h1>
+      <p>গরু ও ছাগল পালন, প্রজনন, ওজন চার্ট, দুধ ও আয়-ব্যয় পোর্টাল</p>
+    </div>
+  </div>
+  <div class="header-actions">
+    <span class="badge" id="sheetStatusBadge">
+      <span class="dot offline" id="sheetDot"></span>
+      <span id="sheetStatusText">লোকাল ডেমো</span>
+    </span>
+    <button class="btn btn-outline btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.4);background:rgba(255,255,255,0.12)" id="logoutBtn" onclick="logout()" style="display:none">লগআউট</button>
+  </div>
+</header>
+
+<div class="container">
+  <!-- LOGIN VIEW -->
+  <div id="loginView" class="login-wrapper">
+    <h2 style="font-size:20px;margin-bottom:6px;color:#0f766e;">খামার পোর্টালে প্রবেশ করুন</h2>
+    <p class="hint" style="margin-bottom:16px;">মোবাইল ও ডেস্কটপ উভয় থেকেই সহজে ব্যবহারযোগ্য</p>
+
+    <div class="login-tabs">
+      <button class="login-tab active" id="tabOwner" onclick="switchLoginTab('owner')">খামার মালিক (Owner)</button>
+      <button class="login-tab" id="tabStaff" onclick="switchLoginTab('staff')">কর্মী / ডাক্তার (Staff)</button>
+    </div>
+
+    <div id="ownerLoginForm">
+      <div class="form-group">
+        <label>ওনার পিন / পাসওয়ার্ড</label>
+        <input type="password" id="ownerPinInput" inputmode="numeric" placeholder="পিন লিখুন (ডিফল্ট: 1234)" value="1234">
+      </div>
+      <button class="btn btn-primary btn-block" onclick="loginOwner()">খামার ড্যাশবোর্ডে যান</button>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap;">
+        <p class="hint" style="margin-top:0;">ডেমো ওনার পিন: <strong>1234</strong></p>
+        <button type="button" class="btn btn-outline btn-sm" onclick="toggleForgotPassword(true)">পাসওয়ার্ড ভুলে গেছেন?</button>
+      </div>
+
+      <div id="forgotPasswordBox" style="display:none;margin-top:14px;padding:14px;border:1px solid #c7d2fe;border-radius:12px;background:#f8fafc;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <strong style="font-size:14px;color:#3730a3;">ওনার পিন রিসেট (tanvirunivogue@gmail.com)</strong>
+          <button type="button" class="btn btn-outline btn-sm" onclick="toggleForgotPassword(false)">বন্ধ</button>
+        </div>
+        <p class="hint" style="margin-bottom:10px;">নিবন্ধিত ইমেইল <strong>tanvirunivogue@gmail.com</strong>-এ ৬ সংখ্যার OTP কোড পাঠানো হবে।</p>
+        <div class="form-group">
+          <label>ইমেইল ঠিকানা</label>
+          <input type="email" id="resetEmailInput" value="tanvirunivogue@gmail.com">
+        </div>
+        <button type="button" class="btn btn-warning btn-sm btn-block" onclick="sendResetOtp()">OTP কোড পাঠান</button>
+
+        <div id="otpVerifyArea" style="display:none;margin-top:12px;padding-top:12px;border-top:1px dashed var(--border);">
+          <div class="form-group">
+            <label>প্রাপ্ত ৬ সংখ্যার OTP কোড</label>
+            <input type="text" id="resetOtpInput" inputmode="numeric" placeholder="যেমন: 482910">
+          </div>
+          <div class="form-group">
+            <label>নতুন ওনার পিন / পাসওয়ার্ড</label>
+            <input type="password" id="newOwnerPinInput" placeholder="নতুন পিন লিখুন (অন্তত ৪ অক্ষর)">
+          </div>
+          <button type="button" class="btn btn-success btn-sm btn-block" onclick="verifyOtpAndResetPin()">নতুন পিন সেট করুন</button>
+        </div>
+        <p id="resetStatusMsg" class="hint" style="margin-top:8px;font-weight:600;"></p>
+      </div>
+    </div>
+
+    <div id="staffLoginForm" style="display:none;">
+      <div class="form-group">
+        <label>কর্মী / ডাক্তার আইডি বা মোবাইল</label>
+        <input type="tel" id="staffIdInput" placeholder="যেমন: 01711000000" value="01711000000">
+      </div>
+      <div class="form-group">
+        <label>পিন (PIN)</label>
+        <input type="password" id="staffPinInput" inputmode="numeric" placeholder="পিন লিখুন (ডিফল্ট: 1234)" value="1234">
+      </div>
+      <button class="btn btn-indigo btn-block" onclick="loginStaff()">কর্মী পোর্টালে যান</button>
+      <p class="hint">ডেমো কর্মী: আইডি <strong>01711000000</strong>, পিন <strong>1234</strong></p>
+    </div>
+  </div>
+
+  <!-- OWNER DASHBOARD -->
+  <div id="ownerDashboard" class="dashboard">
+    <div class="dash-nav" id="ownerTopNav">
+      <button class="nav-btn active" data-sec="overview" onclick="showOwnerSection('overview', this)">ওভারভিউ</button>
+      <button class="nav-btn" data-sec="livestock" onclick="showOwnerSection('livestock', this)">গরু ও ছাগল</button>
+      <button class="nav-btn" data-sec="breeding" onclick="showOwnerSection('breeding', this)">গর্ভ ও প্রসব</button>
+      <button class="nav-btn" data-sec="weight" onclick="showOwnerSection('weight', this)">ওজন চার্ট</button>
+      <button class="nav-btn" data-sec="health" onclick="showOwnerSection('health', this)">স্বাস্থ্য ও টিকা</button>
+      <button class="nav-btn" data-sec="production" onclick="showOwnerSection('production', this)">দুধ ও খাদ্য</button>
+      <button class="nav-btn" data-sec="finance" onclick="showOwnerSection('finance', this)">আয়-ব্যয়</button>
+      <button class="nav-btn" data-sec="sheets" onclick="showOwnerSection('sheets', this)">Google Sheet</button>
+    </div>
+
+    <!-- Overview -->
+    <div id="sec-overview" class="owner-sec">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="label">মোট পশু</div>
+          <div class="value" id="statTotalAnimals">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">গর্ভবতী পশু</div>
+          <div class="value" style="color:#b45309" id="statPregnant">0 টি</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">মোট দুধ</div>
+          <div class="value" style="color:#4f46e5" id="statTotalMilk">0 লি.</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">আয় / খরচ</div>
+          <div class="value" style="color:var(--success);font-size:16px;" id="statIncomeExpense">৳0 / ৳0</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">খামারের বর্তমান পশুর তালিকা</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ট্যাগ</th>
+                <th>ধরন</th>
+                <th>জাত</th>
+                <th>বয়স / ওজন</th>
+                <th>ক্রয়মূল্য</th>
+                <th>অবস্থা</th>
+              </tr>
+            </thead>
+            <tbody id="overviewTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Livestock -->
+    <div id="sec-livestock" class="owner-sec" style="display:none;">
+      <div class="card">
+        <div class="card-title">নতুন গরু বা ছাগল যুক্ত করুন</div>
+        <div class="grid-3">
+          <div class="form-group">
+            <label>ট্যাগ নম্বর / আইডি *</label>
+            <input type="text" id="aTag" placeholder="যেমন: C-101 বা G-201">
+          </div>
+          <div class="form-group">
+            <label>পশুর ধরন *</label>
+            <select id="aType">
+              <option value="গরু">গরু</option>
+              <option value="ছাগল">ছাগল</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>জাত *</label>
+            <input type="text" id="aBreed" placeholder="যেমন: শাহীওয়াল / ব্ল্যাক বেঙ্গল">
+          </div>
+          <div class="form-group">
+            <label>লিঙ্গ</label>
+            <select id="aGender">
+              <option value="মাদি">মাদি</option>
+              <option value="মর্দা">মর্দা</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>বয়স</label>
+            <input type="text" id="aAge" placeholder="যেমন: ২ বছর">
+          </div>
+          <div class="form-group">
+            <label>বর্তমান ওজন (কেজি)</label>
+            <input type="number" inputmode="decimal" id="aWeight" min="0" value="180">
+          </div>
+          <div class="form-group">
+            <label>ক্রয়মূল্য (৳)</label>
+            <input type="number" inputmode="numeric" id="aPrice" min="0" value="65000">
+          </div>
+          <div class="form-group">
+            <label>বর্তমান অবস্থা</label>
+            <select id="aStatus">
+              <option value="সুস্থ">সুস্থ</option>
+              <option value="দুগ্ধবতী">দুগ্ধবতী</option>
+              <option value="গর্ভবতী">গর্ভবতী</option>
+              <option value="চিকিৎসাধীন">চিকিৎসাধীন</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-block" onclick="addAnimal()">পশু সংরক্ষণ করুন</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">সকল গরু ও ছাগলের রেজিস্ট্রি</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ট্যাগ</th>
+                <th>ধরন</th>
+                <th>জাত</th>
+                <th>লিঙ্গ</th>
+                <th>বয়স</th>
+                <th>ওজন</th>
+                <th>ক্রয়মূল্য</th>
+                <th>অবস্থা</th>
+                <th>অ্যাকশন</th>
+              </tr>
+            </thead>
+            <tbody id="animalsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pregnancy & Calving / Kidding Tracker -->
+    <div id="sec-breeding" class="owner-sec" style="display:none;">
+      <div class="card">
+        <div class="card-title">গর্ভধারণ ও বাচ্চা প্রসব ট্র্যাকার</div>
+        <div class="grid-3">
+          <div class="form-group">
+            <label>মাদি পশু নির্বাচন করুন</label>
+            <select id="breedAnimalSelect"></select>
+          </div>
+          <div class="form-group">
+            <label>মেটিং / প্রজননের তারিখ</label>
+            <input type="date" id="bMatingDate" onchange="autoCalcDueDate()">
+          </div>
+          <div class="form-group">
+            <label>সম্ভাব্য প্রসবের তারিখ</label>
+            <input type="date" id="bDueDate">
+          </div>
+          <div class="form-group">
+            <label>প্রসবের অবস্থা</label>
+            <select id="bStage">
+              <option value="গর্ভবতী (অপেক্ষমাণ)">গর্ভবতী (অপেক্ষমাণ)</option>
+              <option value="বাচ্চা প্রসব সম্পন্ন">বাচ্চা প্রসব সম্পন্ন</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>বাচ্চার সংখ্যা ও বিবরণ</label>
+            <input type="text" id="bCalfInfo" placeholder="যেমন: ১টি বাছুর / ২টি ছাগলছানা">
+          </div>
+        </div>
+        <button class="btn btn-indigo btn-block" onclick="addBreedingLog()">প্রজনন ও প্রসব তথ্য সেভ করুন</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">গর্ভধারণ ও বাচ্চা প্রসবের রেকর্ড</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>পশু ট্যাগ</th>
+                <th>মেটিং তারিখ</th>
+                <th>সম্ভাব্য প্রসব</th>
+                <th>অবস্থা</th>
+                <th>বাচ্চার বিবরণ</th>
+              </tr>
+            </thead>
+            <tbody id="breedingTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Weight Growth Tracker & Visual Chart -->
+    <div id="sec-weight" class="owner-sec" style="display:none;">
+      <div class="card">
+        <div class="card-title">নতুন ওজন আপডেট করুন</div>
+        <div class="grid-3">
+          <div class="form-group">
+            <label>পশু নির্বাচন করুন</label>
+            <select id="weightAnimalSelect"></select>
+          </div>
+          <div class="form-group">
+            <label>মাপার তারিখ</label>
+            <input type="date" id="wDate">
+          </div>
+          <div class="form-group">
+            <label>নতুন ওজন (কেজি)</label>
+            <input type="number" inputmode="decimal" step="0.5" id="wKg" min="0" value="210">
+          </div>
+        </div>
+        <button class="btn btn-primary btn-block" onclick="addWeightLog()">ওজন চার্টে যুক্ত করুন</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">পশুভিত্তিক ওজন তুলনা চার্ট (কেজি)</div>
+        <div id="weightChartContainer"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">ওজন বৃদ্ধির ইতিহাস</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>তারিখ</th>
+                <th>পশু ট্যাগ</th>
+                <th>ওজন (কেজি)</th>
+              </tr>
+            </thead>
+            <tbody id="weightTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Health & Vaccination -->
+    <div id="sec-health" class="owner-sec" style="display:none;">
+      <div class="card">
+        <div class="card-title">টিকা, কৃমিনাশক ও চিকিৎসা রেকর্ড</div>
+        <div class="grid-3">
+          <div class="form-group">
+            <label>পশু নির্বাচন করুন</label>
+            <select id="healthAnimalSelect"></select>
+          </div>
+          <div class="form-group">
+            <label>তারিখ</label>
+            <input type="date" id="hDate">
+          </div>
+          <div class="form-group">
+            <label>ধরন</label>
+            <select id="hType">
+              <option value="টিকা">টিকা</option>
+              <option value="কৃমিনাশক">কৃমিনাশক</option>
+              <option value="চিকিৎসা">চিকিৎসা</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>টিকা / ওষুধের নাম ও বিবরণ</label>
+            <input type="text" id="hNote" placeholder="যেমন: FMD টিকা / জ্বর চিকিৎসা">
+          </div>
+          <div class="form-group">
+            <label>খরচ (৳)</label>
+            <input type="number" inputmode="numeric" id="hCost" min="0" value="450">
+          </div>
+          <div class="form-group">
+            <label>পরবর্তী ডোজের তারিখ</label>
+            <input type="date" id="hNextDate">
+          </div>
+        </div>
+        <button class="btn btn-primary btn-block" onclick="addHealthRecord()">স্বাস্থ্য রেকর্ড সেভ করুন</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">স্বাস্থ্য ও টিকার ইতিহাস</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>তারিখ</th>
+                <th>পশু</th>
+                <th>ধরন</th>
+                <th>বিবরণ</th>
+                <th>খরচ</th>
+                <th>পরবর্তী তারিখ</th>
+              </tr>
+            </thead>
+            <tbody id="healthTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Milk, Feed & Production -->
+    <div id="sec-production" class="owner-sec" style="display:none;">
+      <div class="card">
+        <div class="card-title">দৈনিক দুধ উৎপাদন ও খাদ্য হিসাব</div>
+        <div class="grid-3">
+          <div class="form-group">
+            <label>তারিখ</label>
+            <input type="date" id="pDate">
+          </div>
+          <div class="form-group">
+            <label>পশু নির্বাচন করুন</label>
+            <select id="prodAnimalSelect"></select>
+          </div>
+          <div class="form-group">
+            <label>দুধ উৎপাদন (লিটার)</label>
+            <input type="number" inputmode="decimal" step="0.1" id="pMilk" min="0" value="8.5">
+          </div>
+          <div class="form-group">
+            <label>দুধ বিক্রয় আয় (৳)</label>
+            <input type="number" inputmode="numeric" id="pMilkIncome" min="0" value="680">
+          </div>
+          <div class="form-group">
+            <label>খাদ্য ও ঘাস খরচ (৳)</label>
+            <input type="number" inputmode="numeric" id="pFeedCost" min="0" value="550">
+          </div>
+          <div class="form-group">
+            <label>খাদ্যের বিবরণ</label>
+            <input type="text" id="pFeedNote" placeholder="যেমন: নেপিয়ার ঘাস, ভুসি, খৈল">
+          </div>
+        </div>
+        <button class="btn btn-primary btn-block" onclick="addProductionLog()">উৎপাদন ও খাদ্য হিসাব সেভ করুন</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">দুধ ও খাদ্য লগ</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>তারিখ</th>
+                <th>পশু</th>
+                <th>দুধ (লিটার)</th>
+                <th>দুধ আয়</th>
+                <th>খাদ্য খরচ</th>
+                <th>খাদ্যের বিবরণ</th>
+              </tr>
+            </thead>
+            <tbody id="prodTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Finance & Printable Report -->
+    <div id="sec-finance" class="owner-sec" style="display:none;">
+      <div class="card">
+        <div class="card-title">অতিরিক্ত আয় বা খরচ যুক্ত করুন</div>
+        <div class="grid-3">
+          <div class="form-group">
+            <label>তারিখ</label>
+            <input type="date" id="fDate">
+          </div>
+          <div class="form-group">
+            <label>হিসাবের ধরন</label>
+            <select id="fType">
+              <option value="খরচ">খরচ</option>
+              <option value="আয়">আয়</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>খাত</label>
+            <input type="text" id="fCategory" placeholder="যেমন: পশু বিক্রয় / শ্রমিক বেতন / বিদ্যুৎ">
+          </div>
+          <div class="form-group">
+            <label>টাকার পরিমাণ (৳)</label>
+            <input type="number" inputmode="numeric" id="fAmount" min="0" value="1500">
+          </div>
+        </div>
+        <button class="btn btn-primary btn-block" onclick="addFinanceEntry()">হিসাব যুক্ত করুন</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title no-print">
+          <span>খামারের সারসংক্ষেপ রিপোর্ট</span>
+          <button class="btn btn-indigo btn-sm" onclick="window.print()">রিপোর্ট প্রিন্ট করুন</button>
+        </div>
+        <div id="farmReportContainer"></div>
+      </div>
+    </div>
+
+    <!-- Google Sheets Config -->
+    <div id="sec-sheets" class="owner-sec" style="display:none;">
+      <div class="card">
+        <div class="card-title">Google Sheets সংযোগ (tanvirunivogue@gmail.com)</div>
+        <div class="alert alert-info">
+          আপনার Google Sheet-এ তৈরি করা <strong>Web App URL</strong> নিচে পেস্ট করলে নতুন ডেটা স্বয়ংক্রিয়ভাবে Google Sheet-এ যাবে।
+        </div>
+        <div class="form-group">
+          <label>Google Apps Script Web App URL</label>
+          <input type="url" id="sheetWebhookInput" placeholder="https://script.google.com/macros/s/...../exec">
+        </div>
+        <div class="grid-2">
+          <button class="btn btn-primary" onclick="saveSheetUrl()">URL সংরক্ষণ করুন</button>
+          <button class="btn btn-outline" onclick="syncAllToSheet()">সব ডেটা Sheet-এ পাঠান</button>
+        </div>
+        <p id="sheetTestResult" class="hint" style="margin-top:10px;"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAFF PORTAL -->
+  <div id="staffDashboard" class="dashboard">
+    <div class="dash-nav">
+      <button class="nav-btn active" onclick="showStaffSection('s-animals', this)">পশুর তালিকা</button>
+      <button class="nav-btn" onclick="showStaffSection('s-daily', this)">দৈনিক দুধ ও খাদ্য এন্ট্রি</button>
+    </div>
+
+    <div id="sec-s-animals" class="staff-sec">
+      <div class="card">
+        <div class="card-title">খামারের পশুর তালিকা ও বর্তমান অবস্থা</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ট্যাগ</th>
+                <th>ধরন</th>
+                <th>জাত</th>
+                <th>বয়স</th>
+                <th>ওজন</th>
+                <th>অবস্থা</th>
+              </tr>
+            </thead>
+            <tbody id="staffAnimalsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="sec-s-daily" class="staff-sec" style="display:none;">
+      <div class="card">
+        <div class="card-title">দৈনিক দুধ ও খাদ্য এন্ট্রি (কর্মী)</div>
+        <div class="grid-3">
+          <div class="form-group">
+            <label>পশু</label>
+            <select id="staffAnimalSelect"></select>
+          </div>
+          <div class="form-group">
+            <label>দুধ উৎপাদন (লিটার)</label>
+            <input type="number" inputmode="decimal" step="0.1" id="sMilk" value="7.5">
+          </div>
+          <div class="form-group">
+            <label>খাদ্যের বিবরণ</label>
+            <input type="text" id="sFeed" value="ঘাস ও ভুসি">
+          </div>
+        </div>
+        <button class="btn btn-primary btn-block" onclick="addStaffDaily()">এন্ট্রি সেভ করুন</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Fixed Mobile Quick Bottom Navigation (Owner) -->
+<nav class="mobile-bottom-bar" id="mobileBottomBar">
+  <div class="bottom-bar-grid">
+    <button class="bottom-tab active" data-sec="overview" onclick="quickMobileNav('overview', this)">
+      <span>হোম</span>
+    </button>
+    <button class="bottom-tab" data-sec="livestock" onclick="quickMobileNav('livestock', this)">
+      <span>পশু</span>
+    </button>
+    <button class="bottom-tab" data-sec="production" onclick="quickMobileNav('production', this)">
+      <span>দুধ ও খাদ্য</span>
+    </button>
+    <button class="bottom-tab" data-sec="finance" onclick="quickMobileNav('finance', this)">
+      <span>আয়-ব্যয়</span>
+    </button>
+  </div>
+</nav>
+
+<script>
+const STORAGE_KEY = "amar_khamar_db_v3";
+const SHEET_URL_KEY = "amar_khamar_sheet_url";
+const todayISO = new Date().toISOString().slice(0, 10);
+
+const defaultDB = {
+  ownerPin: "1234",
+  ownerEmail: "tanvirunivogue@gmail.com",
+  staff: { id: "01711000000", pin: "1234", name: "মো. সাইফুল ইসলাম" },
+  animals: [
+    { id: "A-1", tag: "C-101", type: "গরু", breed: "শাহীওয়াল", gender: "মাদি", age: "৩ বছর", weight: 320, price: 85000, status: "দুগ্ধবতী" },
+    { id: "A-2", tag: "G-201", type: "ছাগল", breed: "ব্ল্যাক বেঙ্গল", gender: "মাদি", age: "১.৫ বছর", weight: 24, price: 9500, status: "গর্ভবতী" }
+  ],
+  breedingLogs: [
+    { id: "BR-1", animalTag: "G-201", matingDate: "2026-07-01", dueDate: "2026-11-28", stage: "গর্ভবতী (অপেক্ষমাণ)", calfInfo: "সম্ভাব্য ১-২টি ছাগলছানা" }
+  ],
+  weightLogs: [
+    { id: "W-1", date: "2026-09-01", animalTag: "C-101", kg: 295 },
+    { id: "W-2", date: todayISO, animalTag: "C-101", kg: 320 },
+    { id: "W-3", date: todayISO, animalTag: "G-201", kg: 24 }
+  ],
+  healthLogs: [
+    { id: "H-1", date: todayISO, animalTag: "C-101", type: "টিকা", note: "FMD টিকা", cost: 400, nextDate: "" }
+  ],
+  productionLogs: [
+    { id: "P-1", date: todayISO, animalTag: "C-101", milk: 9.0, milkIncome: 720, feedCost: 500, feedNote: "নেপিয়ার ঘাস ও ভুসি" }
+  ],
+  financeLogs: [
+    { id: "F-1", date: todayISO, type: "খরচ", category: "খামার পরিষ্কার ও রক্ষণাবেক্ষণ", amount: 800 }
+  ]
+};
+
+let db = loadDB();
+let currentRole = null;
+
+function loadDB() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : structuredClone(defaultDB);
+  } catch {
+    return structuredClone(defaultDB);
+  }
+}
+
+function saveDB() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+  updateSheetBadge();
+}
+
+function getSheetUrl() {
+  return (localStorage.getItem(SHEET_URL_KEY) || "").trim();
+}
+
+function updateSheetBadge() {
+  const url = getSheetUrl();
+  const dot = document.getElementById("sheetDot");
+  const text = document.getElementById("sheetStatusText");
+  if (url) {
+    dot.classList.remove("offline");
+    text.textContent = "Sheet সংযুক্ত";
+  } else {
+    dot.classList.add("offline");
+    text.textContent = "লোকাল ডেমো";
+  }
+}
+
+async function sendToGoogleSheet(payload) {
+  const url = getSheetUrl();
+  if (!url || payload.action === "ping") return;
+  try {
+    await fetch(url, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload)
+    });
+  } catch (e) {
+    console.warn("Sheet sync warning:", e);
+  }
+}
+
+let generatedResetOtp = null;
+
+function toggleForgotPassword(show) {
+  const box = document.getElementById("forgotPasswordBox");
+  if (box) box.style.display = show ? "block" : "none";
+}
+
+async function sendResetOtp() {
+  const emailInput = document.getElementById("resetEmailInput").value.trim().toLowerCase();
+  const statusEl = document.getElementById("resetStatusMsg");
+  const expectedEmail = (db.ownerEmail || "tanvirunivogue@gmail.com").toLowerCase();
+
+  if (emailInput !== expectedEmail) {
+    statusEl.style.color = "var(--danger)";
+    statusEl.textContent = "শুধুমাত্র tanvirunivogue@gmail.com ইমেইলে রিসেট কোড পাঠানো যাবে।";
+    return;
+  }
+
+  generatedResetOtp = String(Math.floor(100000 + Math.random() * 900000));
+  document.getElementById("otpVerifyArea").style.display = "block";
+
+  const url = getSheetUrl();
+  if (url) {
+    await sendToGoogleSheet({
+      action: "sendAdminOtp",
+      email: emailInput,
+      otp: generatedResetOtp,
+      requestedAt: new Date().toISOString()
+    });
+    statusEl.style.color = "var(--success)";
+    statusEl.textContent = "tanvirunivogue@gmail.com-এ ৬ সংখ্যার OTP পাঠানো হয়েছে।";
+  } else {
+    statusEl.style.color = "var(--danger)";
+    statusEl.textContent = "ইমেইলে OTP পাঠাতে আগে Google Sheet Web App URL যুক্ত করুন।";
+  }
+}
+
+function verifyOtpAndResetPin() {
+  const enteredOtp = document.getElementById("resetOtpInput").value.trim();
+  const newPin = document.getElementById("newOwnerPinInput").value.trim();
+  const statusEl = document.getElementById("resetStatusMsg");
+
+  if (!generatedResetOtp) {
+    statusEl.style.color = "var(--danger)";
+    statusEl.textContent = "আগে 'OTP কোড পাঠান' বাটনে ক্লিক করুন।";
+    return;
+  }
+  if (enteredOtp !== generatedResetOtp) {
+    statusEl.style.color = "var(--danger)";
+    statusEl.textContent = "ভুল OTP কোড! সঠিক ৬ সংখ্যার কোড দিন।";
+    return;
+  }
+  if (!newPin || newPin.length < 4) {
+    statusEl.style.color = "var(--danger)";
+    statusEl.textContent = "নতুন পিন অন্তত ৪ অক্ষরের হতে হবে।";
+    return;
+  }
+
+  db.ownerPin = newPin;
+  db.ownerEmail = "tanvirunivogue@gmail.com";
+  saveDB();
+  sendToGoogleSheet({
+    action: "updateAdminPin",
+    email: db.ownerEmail,
+    updatedAt: new Date().toISOString()
+  });
+
+  generatedResetOtp = null;
+  document.getElementById("ownerPinInput").value = newPin;
+  document.getElementById("resetOtpInput").value = "";
+  document.getElementById("newOwnerPinInput").value = "";
+  document.getElementById("otpVerifyArea").style.display = "none";
+  statusEl.style.color = "var(--success)";
+  statusEl.textContent = "ওনার পিন সফলভাবে রিসেট হয়েছে!";
+}
+
+function switchLoginTab(tab) {
+  document.getElementById("tabOwner").classList.toggle("active", tab === "owner");
+  document.getElementById("tabStaff").classList.toggle("active", tab === "staff");
+  document.getElementById("ownerLoginForm").style.display = tab === "owner" ? "block" : "none";
+  document.getElementById("staffLoginForm").style.display = tab === "staff" ? "block" : "none";
+}
+
+function loginOwner() {
+  const pin = document.getElementById("ownerPinInput").value.trim();
+  if (pin !== db.ownerPin) {
+    alert("ভুল ওনার পিন! ডেমো পিন 1234 ব্যবহার করুন।");
+    return;
+  }
+  currentRole = "owner";
+  document.getElementById("loginView").style.display = "none";
+  document.getElementById("staffDashboard").style.display = "none";
+  document.getElementById("ownerDashboard").style.display = "block";
+  document.getElementById("mobileBottomBar").classList.add("active-bar");
+  document.getElementById("logoutBtn").style.display = "inline-flex";
+  document.getElementById("sheetWebhookInput").value = getSheetUrl();
+  setDefaultDates();
+  refreshOwnerUI();
+}
+
+function loginStaff() {
+  const id = document.getElementById("staffIdInput").value.trim();
+  const pin = document.getElementById("staffPinInput").value.trim();
+  if (id !== db.staff.id || pin !== db.staff.pin) {
+    alert("কর্মী আইডি বা পিন সঠিক নয়!");
+    return;
+  }
+  currentRole = "staff";
+  document.getElementById("loginView").style.display = "none";
+  document.getElementById("ownerDashboard").style.display = "none";
+  document.getElementById("mobileBottomBar").classList.remove("active-bar");
+  document.getElementById("staffDashboard").style.display = "block";
+  document.getElementById("logoutBtn").style.display = "inline-flex";
+  refreshStaffUI();
+}
+
+function logout() {
+  currentRole = null;
+  document.getElementById("ownerDashboard").style.display = "none";
+  document.getElementById("staffDashboard").style.display = "none";
+  document.getElementById("mobileBottomBar").classList.remove("active-bar");
+  document.getElementById("logoutBtn").style.display = "none";
+  document.getElementById("loginView").style.display = "block";
+}
+
+function syncNavActiveStates(sec) {
+  document.querySelectorAll("#ownerTopNav .nav-btn").forEach(b => {
+    const isMatch = b.getAttribute("data-sec") === sec;
+    b.classList.toggle("active", isMatch);
+    if (isMatch) b.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+  });
+  document.querySelectorAll("#mobileBottomBar .bottom-tab").forEach(t => {
+    t.classList.toggle("active", t.getAttribute("data-sec") === sec);
+  });
+}
+
+function showOwnerSection(sec, btn) {
+  document.querySelectorAll(".owner-sec").forEach(el => el.style.display = "none");
+  document.getElementById("sec-" + sec).style.display = "block";
+  syncNavActiveStates(sec);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  refreshOwnerUI();
+}
+
+function quickMobileNav(sec, tabBtn) {
+  showOwnerSection(sec, tabBtn);
+}
+
+function showStaffSection(sec, btn) {
+  document.querySelectorAll(".staff-sec").forEach(el => el.style.display = "none");
+  document.getElementById("sec-" + sec).style.display = "block";
+  document.querySelectorAll("#staffDashboard .nav-btn").forEach(b => b.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+  refreshStaffUI();
+}
+
+function setDefaultDates() {
+  ["hDate", "pDate", "fDate", "wDate", "bMatingDate"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && !el.value) el.value = todayISO;
+  });
+}
+
+function autoCalcDueDate() {
+  const tag = document.getElementById("breedAnimalSelect").value;
+  const animal = db.animals.find(a => a.tag === tag);
+  const matingVal = document.getElementById("bMatingDate").value;
+  if (!matingVal) return;
+  const d = new Date(matingVal);
+  const daysToAdd = (animal && animal.type === "ছাগল") ? 150 : 283;
+  d.setDate(d.getDate() + daysToAdd);
+  document.getElementById("bDueDate").value = d.toISOString().slice(0, 10);
+}
+
+function statusPill(st) {
+  if (st === "সুস্থ" || st === "দুগ্ধবতী" || st === "বাচ্চা প্রসব সম্পন্ন") return `<span class="status-pill status-healthy">${st}</span>`;
+  if (st.includes("গর্ভবতী")) return `<span class="status-pill status-preg">${st}</span>`;
+  return `<span class="status-pill status-treat">${st}</span>`;
+}
+
+function computeTotals() {
+  const totalMilk = db.productionLogs.reduce((s, p) => s + Number(p.milk || 0), 0);
+  const milkIncome = db.productionLogs.reduce((s, p) => s + Number(p.milkIncome || 0), 0);
+  const extraIncome = db.financeLogs.filter(f => f.type === "আয়").reduce((s, f) => s + Number(f.amount || 0), 0);
+  const totalIncome = milkIncome + extraIncome;
+
+  const animalCost = db.animals.reduce((s, a) => s + Number(a.price || 0), 0);
+  const healthCost = db.healthLogs.reduce((s, h) => s + Number(h.cost || 0), 0);
+  const feedCost = db.productionLogs.reduce((s, p) => s + Number(p.feedCost || 0), 0);
+  const extraExpense = db.financeLogs.filter(f => f.type === "খরচ").reduce((s, f) => s + Number(f.amount || 0), 0);
+  const totalExpense = animalCost + healthCost + feedCost + extraExpense;
+
+  const pregnantCount = db.animals.filter(a => a.status === "গর্ভবতী").length;
+  return { totalMilk, totalIncome, totalExpense, pregnantCount };
+}
+
+function refreshOwnerUI() {
+  const t = computeTotals();
+  document.getElementById("statTotalAnimals").textContent = db.animals.length;
+  document.getElementById("statPregnant").textContent = t.pregnantCount + " টি";
+  document.getElementById("statTotalMilk").textContent = t.totalMilk.toLocaleString("bn-BD") + " লি.";
+  document.getElementById("statIncomeExpense").textContent = "৳" + t.totalIncome.toLocaleString("bn-BD") + " / ৳" + t.totalExpense.toLocaleString("bn-BD");
+
+  document.getElementById("overviewTableBody").innerHTML = db.animals.map(a => `<tr>
+    <td><strong>${a.tag}</strong></td>
+    <td>${a.type}</td>
+    <td>${a.breed}</td>
+    <td>${a.age} / ${a.weight} কেজি</td>
+    <td>৳${Number(a.price || 0).toLocaleString("bn-BD")}</td>
+    <td>${statusPill(a.status)}</td>
+  </tr>`).join("");
+
+  document.getElementById("animalsTableBody").innerHTML = db.animals.map(a => `<tr>
+    <td><strong>${a.tag}</strong></td>
+    <td>${a.type}</td>
+    <td>${a.breed}</td>
+    <td>${a.gender}</td>
+    <td>${a.age}</td>
+    <td>${a.weight} কেজি</td>
+    <td>৳${Number(a.price || 0).toLocaleString("bn-BD")}</td>
+    <td>${statusPill(a.status)}</td>
+    <td><button class="btn btn-danger btn-sm" onclick="deleteAnimal('${a.id}')">মুছুন</button></td>
+  </tr>`).join("");
+
+  const animalOpts = db.animals.map(a => `<option value="${a.tag}">${a.tag} (${a.type} - ${a.breed})</option>`).join("");
+  ["healthAnimalSelect", "prodAnimalSelect", "breedAnimalSelect", "weightAnimalSelect"].forEach(id => {
+    const sel = document.getElementById(id);
+    if (sel) {
+      const prev = sel.value;
+      sel.innerHTML = animalOpts;
+      if (prev && db.animals.some(a => a.tag === prev)) sel.value = prev;
+    }
+  });
+
+  document.getElementById("breedingTableBody").innerHTML = db.breedingLogs.map(b => `<tr>
+    <td><strong>${b.animalTag}</strong></td>
+    <td>${b.matingDate || "-"}</td>
+    <td><strong>${b.dueDate || "-"}</strong></td>
+    <td>${statusPill(b.stage)}</td>
+    <td>${b.calfInfo || "-"}</td>
+  </tr>`).join("");
+
+  const maxWeight = Math.max(50, ...db.animals.map(a => Number(a.weight || 0)));
+  document.getElementById("weightChartContainer").innerHTML = db.animals.map(a => {
+    const w = Number(a.weight || 0);
+    const pct = Math.min(100, Math.round((w / maxWeight) * 100));
+    return `<div class="chart-row">
+      <div class="chart-label"><span>${a.tag} (${a.type} - ${a.breed})</span><span>${w} কেজি</span></div>
+      <div class="chart-track"><div class="chart-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join("") || "<p class='hint'>কোনো পশুর ওজন ডেটা নেই।</p>";
+
+  document.getElementById("weightTableBody").innerHTML = db.weightLogs.map(w => `<tr>
+    <td>${w.date}</td>
+    <td><strong>${w.animalTag}</strong></td>
+    <td>${Number(w.kg || 0)} কেজি</td>
+  </tr>`).join("");
+
+  document.getElementById("healthTableBody").innerHTML = db.healthLogs.map(h => `<tr>
+    <td>${h.date}</td>
+    <td><strong>${h.animalTag}</strong></td>
+    <td>${h.type}</td>
+    <td>${h.note}</td>
+    <td>৳${Number(h.cost || 0).toLocaleString("bn-BD")}</td>
+    <td>${h.nextDate || "-"}</td>
+  </tr>`).join("");
+
+  document.getElementById("prodTableBody").innerHTML = db.productionLogs.map(p => `<tr>
+    <td>${p.date}</td>
+    <td><strong>${p.animalTag}</strong></td>
+    <td>${Number(p.milk || 0)} লি.</td>
+    <td style="color:var(--success)">৳${Number(p.milkIncome || 0).toLocaleString("bn-BD")}</td>
+    <td style="color:var(--danger)">৳${Number(p.feedCost || 0).toLocaleString("bn-BD")}</td>
+    <td>${p.feedNote || "-"}</td>
+  </tr>`).join("");
+
+  renderFinanceReport();
+}
+
+function addAnimal() {
+  const tag = document.getElementById("aTag").value.trim();
+  const type = document.getElementById("aType").value;
+  const breed = document.getElementById("aBreed").value.trim();
+  const gender = document.getElementById("aGender").value;
+  const age = document.getElementById("aAge").value.trim() || "১ বছর";
+  const weight = Number(document.getElementById("aWeight").value || 0);
+  const price = Number(document.getElementById("aPrice").value || 0);
+  const status = document.getElementById("aStatus").value;
+
+  if (!tag || !breed) {
+    alert("ট্যাগ নম্বর এবং জাত অবশ্যই লিখুন।");
+    return;
+  }
+
+  const item = { id: "A-" + Date.now(), tag, type, breed, gender, age, weight, price, status };
+  db.animals.push(item);
+  db.weightLogs.push({ id: "W-" + Date.now(), date: todayISO, animalTag: tag, kg: weight });
+  saveDB();
+  sendToGoogleSheet({ action: "addAnimal", animal: item });
+
+  document.getElementById("aTag").value = "";
+  document.getElementById("aBreed").value = "";
+  alert("নতুন পশু যুক্ত হয়েছে!");
+  refreshOwnerUI();
+}
+
+function deleteAnimal(id) {
+  if (!confirm("আপনি কি এই পশুর রেকর্ড মুছে ফেলতে চান?")) return;
+  db.animals = db.animals.filter(a => a.id !== id);
+  saveDB();
+  refreshOwnerUI();
+}
+
+function addBreedingLog() {
+  const animalTag = document.getElementById("breedAnimalSelect").value;
+  const matingDate = document.getElementById("bMatingDate").value;
+  const dueDate = document.getElementById("bDueDate").value;
+  const stage = document.getElementById("bStage").value;
+  const calfInfo = document.getElementById("bCalfInfo").value.trim();
+
+  if (!animalTag) return;
+  const log = { id: "BR-" + Date.now(), animalTag, matingDate, dueDate, stage, calfInfo };
+  db.breedingLogs.push(log);
+  const targetAnimal = db.animals.find(a => a.tag === animalTag);
+  if (targetAnimal) {
+    targetAnimal.status = stage.includes("সম্পন্ন") ? "দুগ্ধবতী" : "গর্ভবতী";
+  }
+  saveDB();
+  sendToGoogleSheet({ action: "addBreeding", breeding: log });
+  document.getElementById("bCalfInfo").value = "";
+  alert("গর্ভধারণ ও প্রসব তথ্য সংরক্ষণ করা হয়েছে!");
+  refreshOwnerUI();
+}
+
+function addWeightLog() {
+  const animalTag = document.getElementById("weightAnimalSelect").value;
+  const date = document.getElementById("wDate").value || todayISO;
+  const kg = Number(document.getElementById("wKg").value || 0);
+  if (!animalTag || kg <= 0) {
+    alert("সঠিক ওজন লিখুন।");
+    return;
+  }
+  const entry = { id: "W-" + Date.now(), date, animalTag, kg };
+  db.weightLogs.push(entry);
+  const targetAnimal = db.animals.find(a => a.tag === animalTag);
+  if (targetAnimal) targetAnimal.weight = kg;
+  saveDB();
+  sendToGoogleSheet({ action: "addWeight", weight: entry });
+  alert("ওজন চার্ট আপডেট হয়েছে!");
+  refreshOwnerUI();
+}
+
+function addHealthRecord() {
+  const animalTag = document.getElementById("healthAnimalSelect").value;
+  const date = document.getElementById("hDate").value || todayISO;
+  const type = document.getElementById("hType").value;
+  const note = document.getElementById("hNote").value.trim();
+  const cost = Number(document.getElementById("hCost").value || 0);
+  const nextDate = document.getElementById("hNextDate").value;
+
+  if (!animalTag || !note) {
+    alert("পশু এবং টিকা/চিকিৎসার বিবরণ লিখুন।");
+    return;
+  }
+
+  const rec = { id: "H-" + Date.now(), date, animalTag, type, note, cost, nextDate };
+  db.healthLogs.push(rec);
+  saveDB();
+  sendToGoogleSheet({ action: "addHealth", health: rec });
+
+  document.getElementById("hNote").value = "";
+  alert("স্বাস্থ্য রেকর্ড সংরক্ষণ করা হয়েছে!");
+  refreshOwnerUI();
+}
+
+function addProductionLog() {
+  const date = document.getElementById("pDate").value || todayISO;
+  const animalTag = document.getElementById("prodAnimalSelect").value;
+  const milk = Number(document.getElementById("pMilk").value || 0);
+  const milkIncome = Number(document.getElementById("pMilkIncome").value || 0);
+  const feedCost = Number(document.getElementById("pFeedCost").value || 0);
+  const feedNote = document.getElementById("pFeedNote").value.trim();
+
+  const log = { id: "P-" + Date.now(), date, animalTag, milk, milkIncome, feedCost, feedNote };
+  db.productionLogs.push(log);
+  saveDB();
+  sendToGoogleSheet({ action: "addProduction", production: log });
+
+  alert("দৈনিক দুধ ও খাদ্য হিসাব সংরক্ষণ করা হয়েছে!");
+  refreshOwnerUI();
+}
+
+function addFinanceEntry() {
+  const date = document.getElementById("fDate").value || todayISO;
+  const type = document.getElementById("fType").value;
+  const category = document.getElementById("fCategory").value.trim();
+  const amount = Number(document.getElementById("fAmount").value || 0);
+
+  if (!category || amount <= 0) {
+    alert("সঠিক খাত এবং টাকার পরিমাণ লিখুন।");
+    return;
+  }
+
+  const entry = { id: "F-" + Date.now(), date, type, category, amount };
+  db.financeLogs.push(entry);
+  saveDB();
+  sendToGoogleSheet({ action: "addFinance", finance: entry });
+
+  document.getElementById("fCategory").value = "";
+  alert("আয়/ব্যয়ের হিসাব যুক্ত হয়েছে!");
+  refreshOwnerUI();
+}
+
+function renderFinanceReport() {
+  const t = computeTotals();
+  const rows = db.financeLogs.map(f => `<tr>
+    <td>${f.date}</td>
+    <td>${f.type}</td>
+    <td>${f.category}</td>
+    <td>৳${Number(f.amount || 0).toLocaleString("bn-BD")}</td>
+  </tr>`).join("");
+
+  document.getElementById("farmReportContainer").innerHTML = `
+    <div class="report-box">
+      <div class="report-header">
+        <h2 style="font-size:20px;color:#0f766e;">আমার খামার — আয়, ব্যয় ও উৎপাদন সারসংক্ষেপ</h2>
+        <p style="font-size:13px;color:#475569;">গরু ও ছাগল পালন ব্যবস্থাপনা প্রতিবেদন</p>
+      </div>
+      <div class="grid-2" style="margin-bottom:14px;font-size:14px;">
+        <div><strong>মোট পশু:</strong> ${db.animals.length} টি</div>
+        <div><strong>মোট দুধ উৎপাদন:</strong> ${t.totalMilk.toLocaleString("bn-BD")} লিটার</div>
+        <div><strong>মোট আয়:</strong> ৳${t.totalIncome.toLocaleString("bn-BD")}</div>
+        <div><strong>মোট খরচ:</strong> ৳${t.totalExpense.toLocaleString("bn-BD")}</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>তারিখ</th><th>ধরন</th><th>খাত</th><th>পরিমাণ</th></tr>
+          </thead>
+          <tbody>${rows || `<tr><td colspan="4">কোনো অতিরিক্ত হিসাব নেই</td></tr>`}</tbody>
+        </table>
+      </div>
+      <div class="report-sign">
+        <div>খামার কর্মী / দায়িত্বপ্রাপ্ত</div>
+        <div>খামার মালিকের স্বাক্ষর</div>
+      </div>
+    </div>
+  `;
+}
+
+function refreshStaffUI() {
+  document.getElementById("staffAnimalsBody").innerHTML = db.animals.map(a => `<tr>
+    <td><strong>${a.tag}</strong></td>
+    <td>${a.type}</td>
+    <td>${a.breed}</td>
+    <td>${a.age}</td>
+    <td>${a.weight} কেজি</td>
+    <td>${statusPill(a.status)}</td>
+  </tr>`).join("");
+
+  document.getElementById("staffAnimalSelect").innerHTML = db.animals
+    .map(a => `<option value="${a.tag}">${a.tag} (${a.type})</option>`).join("");
+}
+
+function addStaffDaily() {
+  const animalTag = document.getElementById("staffAnimalSelect").value;
+  const milk = Number(document.getElementById("sMilk").value || 0);
+  const feedNote = document.getElementById("sFeed").value.trim();
+
+  const log = { id: "P-" + Date.now(), date: todayISO, animalTag, milk, milkIncome: 0, feedCost: 0, feedNote };
+  db.productionLogs.push(log);
+  saveDB();
+  sendToGoogleSheet({ action: "addProduction", production: log });
+  alert("দৈনিক এন্ট্রি সংরক্ষণ করা হয়েছে!");
+}
+
+function saveSheetUrl() {
+  const url = document.getElementById("sheetWebhookInput").value.trim();
+  localStorage.setItem(SHEET_URL_KEY, url);
+  updateSheetBadge();
+  const resEl = document.getElementById("sheetTestResult");
+  if (!url) {
+    resEl.textContent = "URL খালি রাখা হয়েছে। অ্যাপটি লোকাল ডেমো মোডে চলবে।";
+    return;
+  }
+  resEl.textContent = "Web App URL সংরক্ষণ করা হয়েছে!";
+  sendToGoogleSheet({ action: "ping", timestamp: new Date().toISOString() });
+}
+
+function syncAllToSheet() {
+  const url = getSheetUrl();
+  if (!url) {
+    alert("আগে Google Apps Script Web App URL সংরক্ষণ করুন।");
+    return;
+  }
+  sendToGoogleSheet({
+    action: "fullSync",
+    animals: db.animals,
+    breedingLogs: db.breedingLogs,
+    weightLogs: db.weightLogs,
+    healthLogs: db.healthLogs,
+    productionLogs: db.productionLogs,
+    financeLogs: db.financeLogs
+  });
+  alert("খামারের বর্তমান সব ডেটা Google Sheet-এ পাঠানো হয়েছে।");
+}
+
+updateSheetBadge();
+</script>
+</body>
+</html>
